@@ -28,6 +28,9 @@
 #include "User_config.h"
 
 #ifdef ZgatewayRF
+#ifdef ZradioCC1101
+  #include <ELECHOUSE_CC1101_RCS_DRV.h>
+#endif
 
 #include <RCSwitch.h> // library for controling Radio frequency switch
 
@@ -52,9 +55,13 @@ void RFtoMQTTdiscovery(unsigned long MQTTvalue)
 }
 #endif
 
-void setupRF()
-{
-
+void setupRF(){
+  #ifdef ZradioCC1101 //receiving with RF2 CC1101
+    trc(CC1101_FREQUENCY);
+    ELECHOUSE_cc1101.setMHZ(CC1101_FREQUENCY);
+    ELECHOUSE_cc1101.Init();
+    ELECHOUSE_cc1101.SetRx();
+  #endif
   //RF init parameters
   mySwitch.enableTransmit(RF_EMITTER_PIN);
   trc(F("RF_EMITTER_PIN "));
@@ -171,28 +178,36 @@ void MQTTtoRF(char *topicOri, char *datacallback)
 #endif
 
 #ifdef jsonReceiving
-void MQTTtoRF(char *topicOri, JsonObject &RFdata)
-{ // json object decoding
-  if (cmpToMainTopic(topicOri, subjectMQTTtoRF))
-  {
-    trc(F("MQTTtoRF json"));
-    unsigned long data = RFdata["value"];
-    if (data != 0)
-    {
-      int valuePRT = RFdata["protocol"] | 1;
-      int valuePLSL = RFdata["delay"] | 350;
-      int valueBITS = RFdata["length"] | 24;
-      int valueRPT = RFdata["repeat"] | RF_EMITTER_REPEAT;
-      mySwitch.setRepeatTransmit(valueRPT);
-      mySwitch.setProtocol(valuePRT, valuePLSL);
-      mySwitch.send(data, valueBITS);
-      trc(F("MQTTtoRF OK"));
-      pub(subjectGTWRFtoMQTT, RFdata);               // we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
-      mySwitch.setRepeatTransmit(RF_EMITTER_REPEAT); // Restore the default value
-    }
-    else
-    {
-      trc(F("MQTTtoRF Fail json"));
+  void MQTTtoRF(char * topicOri, JsonObject& RFdata) { // json object decoding
+  
+   if (strcmp(topicOri,subjectMQTTtoRF) == 0){
+      trc(F("MQTTtoRF json"));
+      unsigned long data = RFdata["value"];
+      if (data != 0) {
+        int valuePRT =  RFdata["protocol"]|1;
+        int valuePLSL = RFdata["delay"]|350;
+        int valueBITS = RFdata["length"]|24;
+        int valueRPT = RFdata["repeat"]|RF_EMITTER_REPEAT;
+        #ifdef ZradioCC1101
+          ELECHOUSE_cc1101.SetTx();           // set Transmit on
+          mySwitch.disableReceive();         // Receiver off
+          mySwitch.enableTransmit(RF_EMITTER_PIN);   // Transmit on
+        #endif
+        mySwitch.setRepeatTransmit(valueRPT);
+        mySwitch.setProtocol(valuePRT,valuePLSL);
+        mySwitch.send(data, valueBITS);
+        trc(F("MQTTtoRF OK"));
+        pub(subjectGTWRFtoMQTT, RFdata);// we acknowledge the sending by publishing the value to an acknowledgement topic, for the moment even if it is a signal repetition we acknowledge also
+        mySwitch.setRepeatTransmit(RF_EMITTER_REPEAT); // Restore the default value
+        #ifdef ZradioCC1101
+          ELECHOUSE_cc1101.SetRx();      // set Recive on
+          mySwitch.disableTransmit();   // set Transmit off
+          mySwitch.enableReceive(RF_RECEIVER_PIN);   // Receiver on
+        #endif
+
+      }else{
+        trc(F("MQTTtoRF Fail json"));
+      }
     }
   }
 }

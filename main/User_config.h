@@ -111,13 +111,12 @@ char gateway_name[parameters_size * 2] = Gateway_Name;
 /*-------------DEFINE THE MODULES YOU WANT BELOW----------------*/
 //Addons and module management, comment the Z line
 
-//#define ZgatewayRF     "RF"       //ESP8266, Arduino, ESP32
+// #define ZgatewayRF     "RF"       //ESP8266, Arduino, ESP32
 //#define ZgatewayIR     "IR"       //ESP8266, Arduino,         Sonoff RF Bridge
 //#define ZgatewayLORA   "LORA"       //ESP8266, Arduino, ESP32
 //#define ZgatewayPilight "Pilight" //ESP8266, Arduino, ESP32
 //#define ZgatewayBT     "BT"       //ESP8266, ESP32
 #define ZgatewayRF2    "RF2"      //ESP8266, Arduino, ESP32
-#define ZgatewayRF2CC1101 "RF2CC1101"      //ESP8266, Arduino, ESP32
 //#define ZgatewaySRFB   "SRFB"     //                          Sonoff RF Bridge
 //#define Zgateway2G     "2G"       //ESP8266, Arduino, ESP32
 //#define ZgatewayRFM69  "RFM69"    //ESP8266, Arduino, ESP32
@@ -134,6 +133,8 @@ char gateway_name[parameters_size * 2] = Gateway_Name;
 //#define ZsensorGPIOInput "GPIOInput" //ESP8266, Arduino, ESP32
 //#define ZmqttDiscovery "HADiscovery"//ESP8266, Arduino, ESP32, Sonoff RF Bridge
 //#define ZactuatorFASTLED "FASTLED"  //ESP8266, Arduino, ESP32, Sonoff RF Bridge
+#define ZradioCC1101 "ZradioCC1101"       //ZgatewayRF & ZgatewayRF2, ESP8266, Arduino, ESP32
+
 
 /*-------------DEFINE YOUR MQTT ADVANCED PARAMETERS BELOW----------------*/
 #define version_Topic  "/version"

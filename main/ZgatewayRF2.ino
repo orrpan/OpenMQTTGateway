@@ -37,7 +37,7 @@ sudo mosquitto_pub -t home/commands/MQTTtoRF2/CODE_8233372/UNIT_0/PERIOD_272 -m/
 
 #ifdef ZgatewayRF2
 
-#ifdef ZgatewayRF2CC1101
+#ifdef ZradioCC1101
   #include <ELECHOUSE_CC1101_RCS_DRV.h>
 #endif
 #include <NewRemoteTransmitter.h>
@@ -57,8 +57,9 @@ RF2rxd rf2rd;
 
 void setupRF2(){
     #ifndef ZgatewayRF //receiving with RF2 is not compatible with ZgatewayRF
-      #ifdef ZgatewayRF2CC1101 //receiving with RF2 CC1101
-        ELECHOUSE_cc1101.setMHZ(433.92);
+      #ifdef ZradioCC1101 //receiving with RF2 CC1101
+        trc(CC1101_FREQUENCY);
+        ELECHOUSE_cc1101.setMHZ(CC1101_FREQUENCY);
         ELECHOUSE_cc1101.Init();
         ELECHOUSE_cc1101.SetRx();
       #endif
@@ -173,7 +174,7 @@ void rf2Callback(unsigned int period, unsigned long address, unsigned long group
       trc(valueDIM);
       NewRemoteReceiver::disable();
       trc(F("Creating transmitter"));
-      #ifdef ZgatewayRF2CC1101
+      #ifdef ZradioCC1101
         ELECHOUSE_cc1101.SetTx();  // set Transmit on
       #endif
       NewRemoteTransmitter transmitter(valueCODE, RF_EMITTER_PIN, valuePERIOD);
@@ -191,7 +192,7 @@ void rf2Callback(unsigned int period, unsigned long address, unsigned long group
         transmitter.sendGroup(boolSWITCHTYPE);
       }
       trc(F("Data sent"));
-      #ifdef ZgatewayRF2CC1101
+      #ifdef ZradioCC1101
         ELECHOUSE_cc1101.SetRx();  // set Recive on
       #endif
       NewRemoteReceiver::enable();
@@ -280,7 +281,7 @@ void rf2Callback(unsigned int period, unsigned long address, unsigned long group
           trc(boolSWITCHTYPE);
           trc(valueDIM);
           NewRemoteReceiver::disable();
-          #ifdef ZgatewayRF2CC1101
+          #ifdef ZradioCC1101
             ELECHOUSE_cc1101.SetTx();
           #endif
           NewRemoteTransmitter transmitter(valueCODE, RF_EMITTER_PIN, valuePERIOD);
@@ -298,7 +299,7 @@ void rf2Callback(unsigned int period, unsigned long address, unsigned long group
             transmitter.sendGroup(boolSWITCHTYPE);
           }
           trc(F("MQTTtoRF2 OK"));
-          #ifdef ZgatewayRF2CC1101
+          #ifdef ZradioCC1101
             ELECHOUSE_cc1101.SetRx();  // set Recive on
           #endif
           NewRemoteReceiver::enable();

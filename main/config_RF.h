@@ -93,7 +93,7 @@ RF supported protocols
 /*-------------------PIN DEFINITIONS----------------------*/
 #ifndef RF_RECEIVER_PIN
     #ifdef ESP8266
-        #define RF_RECEIVER_PIN 0 // D3 on nodemcu // put 4 with rf bridge direct mod
+        #define RF_RECEIVER_PIN 4 // D3 on nodemcu // put 4 with rf bridge direct mod 
     #elif ESP32
         #define RF_RECEIVER_PIN 27 // D27 on DOIT ESP32
     #elif __AVR_ATmega2560__
@@ -105,7 +105,7 @@ RF supported protocols
 
 #ifndef RF_EMITTER_PIN
     #ifdef ESP8266
-        #define RF_EMITTER_PIN 3 // RX on nodemcu if it doesn't work with 3, try with 4 (D2) // put 5 with rf bridge direct mod
+        #define RF_EMITTER_PIN 5 // RX on nodemcu if it doesn't work with 3, try with 4 (D2) // put 5 with rf bridge direct mod
     #elif ESP32
         #define RF_EMITTER_PIN 12 // D12 on DOIT ESP32
     #elif __AVR_ATmega2560__

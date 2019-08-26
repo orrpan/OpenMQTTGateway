@@ -27,18 +27,16 @@
 */
 #include "User_config.h"
 
- #ifdef ZgatewayPilight
- #ifdef ZradioCC1101
+#ifdef ZgatewayPilight
+#ifdef ZradioCC1101
   #include <ELECHOUSE_CC1101_RCS_DRV.h>
 #endif
- #include <ESPiLight.h>
- ESPiLight rf(RF_EMITTER_PIN);  // use -1 to disable transmitter
+#include <ESPiLight.h>
+ESPiLight rf(RF_EMITTER_PIN);  // use -1 to disable transmitter
 
-void pilightCallback(const String &protocol, const String &message, int status,
-                     size_t repeats, const String &deviceID)
-{
-  if (status == VALID)
-  {
+void pilightCallback(const String &protocol,const String &message, int status,
+                size_t repeats, const String &deviceID) {
+  if (status == VALID) {
     trc(F("Creating RF PiLight buffer"));
     StaticJsonBuffer<JSON_MSG_BUFFER> jsonBuffer;
     JsonObject &RFPiLightdata = jsonBuffer.createObject();
@@ -49,33 +47,32 @@ void pilightCallback(const String &protocol, const String &message, int status,
     RFPiLightdata.set("length", (char *)deviceID.c_str());
     RFPiLightdata.set("repeats", (int)repeats);
     RFPiLightdata.set("status", (int)status);
-    pub(subjectPilighttoMQTT, RFPiLightdata);
-    if (repeatPilightwMQTT)
-    {
+    pub(subjectPilighttoMQTT,RFPiLightdata);
+    if (repeatPilightwMQTT){
       trc(F("Pub Pilight for rpt"));
-      pub(subjectMQTTtoPilight, RFPiLightdata);
+      pub(subjectMQTTtoPilight,RFPiLightdata);
     }
   }
 }
 
 void setupPilight(){
-    #ifndef ZgatewayRF && ZgatewayRF2 && ZgatewayRF315 //receiving with Pilight is not compatible with ZgatewayRF or RF2 or RF315 as far as I can tell 
-        #ifdef ZradioCC1101 //receiving with RF2 CC1101
-          trc(CC1101_FREQUENCY);
-          ELECHOUSE_cc1101.setMHZ(CC1101_FREQUENCY);
-          ELECHOUSE_cc1101.Init();
-          ELECHOUSE_cc1101.SetRx();
-        #endif
-        rf.setCallback(pilightCallback);
-        rf.initReceiver(RF_RECEIVER_PIN);
-        trc(F("RF_EMITTER_PIN "));
-        trc(String(RF_EMITTER_PIN));
-        trc(F("RF_RECEIVER_PIN "));
-        trc(String(RF_RECEIVER_PIN));
-        trc(F("ZgatewayPilight setup done "));
-    #else
-        trc(F("ZgatewayPilight setup cannot be done, comment first ZgatewayRF && ZgatewayRF2 && ZgatewayRF315"));
+  #ifndef ZgatewayRF && ZgatewayRF2 && ZgatewayRF315 //receiving with Pilight is not compatible with ZgatewayRF or RF2 or RF315 as far as I can tell 
+    #ifdef ZradioCC1101 //receiving with RF2 CC1101
+      trc(CC1101_FREQUENCY);
+      ELECHOUSE_cc1101.setMHZ(CC1101_FREQUENCY);
+      ELECHOUSE_cc1101.Init();
+      ELECHOUSE_cc1101.SetRx();
     #endif
+    rf.setCallback(pilightCallback);
+    rf.initReceiver(RF_RECEIVER_PIN);
+    trc(F("RF_EMITTER_PIN "));
+    trc(String(RF_EMITTER_PIN));
+    trc(F("RF_RECEIVER_PIN "));
+    trc(String(RF_RECEIVER_PIN));
+    trc(F("ZgatewayPilight setup done "));
+  #else
+    trc(F("ZgatewayPilight setup cannot be done, comment first ZgatewayRF && ZgatewayRF2 && ZgatewayRF315"));
+  #endif
 }
 
 void PilighttoMQTT()

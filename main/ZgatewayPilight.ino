@@ -27,9 +27,12 @@
 */
 #include "User_config.h"
 
-#ifdef ZgatewayPilight
-#include <ESPiLight.h>
-ESPiLight rf(RF_EMITTER_PIN); // use -1 to disable transmitter
+ #ifdef ZgatewayPilight
+ #ifdef ZradioCC1101
+  #include <ELECHOUSE_CC1101_RCS_DRV.h>
+#endif
+ #include <ESPiLight.h>
+ ESPiLight rf(RF_EMITTER_PIN);  // use -1 to disable transmitter
 
 void pilightCallback(const String &protocol, const String &message, int status,
                      size_t repeats, const String &deviceID)
@@ -55,19 +58,24 @@ void pilightCallback(const String &protocol, const String &message, int status,
   }
 }
 
-void setupPilight()
-{
-#ifndef ZgatewayRF &&ZgatewayRF2 &&ZgatewayRF315 //receiving with Pilight is not compatible with ZgatewayRF or RF2 or RF315 as far as I can tell
-  rf.setCallback(pilightCallback);
-  rf.initReceiver(RF_RECEIVER_PIN);
-  trc(F("RF_EMITTER_PIN "));
-  trc(String(RF_EMITTER_PIN));
-  trc(F("RF_RECEIVER_PIN "));
-  trc(String(RF_RECEIVER_PIN));
-  trc(F("ZgatewayPilight setup done "));
-#else
-  trc(F("ZgatewayPilight setup cannot be done, comment first ZgatewayRF && ZgatewayRF2 && ZgatewayRF315"));
-#endif
+void setupPilight(){
+    #ifndef ZgatewayRF && ZgatewayRF2 && ZgatewayRF315 //receiving with Pilight is not compatible with ZgatewayRF or RF2 or RF315 as far as I can tell 
+        #ifdef ZradioCC1101 //receiving with RF2 CC1101
+          trc(CC1101_FREQUENCY);
+          ELECHOUSE_cc1101.setMHZ(CC1101_FREQUENCY);
+          ELECHOUSE_cc1101.Init();
+          ELECHOUSE_cc1101.SetRx();
+        #endif
+        rf.setCallback(pilightCallback);
+        rf.initReceiver(RF_RECEIVER_PIN);
+        trc(F("RF_EMITTER_PIN "));
+        trc(String(RF_EMITTER_PIN));
+        trc(F("RF_RECEIVER_PIN "));
+        trc(String(RF_RECEIVER_PIN));
+        trc(F("ZgatewayPilight setup done "));
+    #else
+        trc(F("ZgatewayPilight setup cannot be done, comment first ZgatewayRF && ZgatewayRF2 && ZgatewayRF315"));
+    #endif
 }
 
 void PilighttoMQTT()
@@ -96,11 +104,15 @@ void MQTTtoPilight(char *topicOri, JsonObject &Pilightdata)
       if (msgLength > 0)
       {
         trc(F("MQTTtoPilight raw ok"));
+        #ifdef ZradioCC1101
+          ELECHOUSE_cc1101.SetTx();           // set Transmit on
+        #endif
         rf.sendPulseTrain(codes, msgLength);
         result = msgLength;
-      }
-      else
-      {
+        #ifdef ZradioCC1101
+          ELECHOUSE_cc1101.SetRx();           // set Transmit on
+        #endif
+      }else{
         trc(F("MQTTtoPilight raw KO"));
         switch (result)
         {
@@ -122,10 +134,14 @@ void MQTTtoPilight(char *topicOri, JsonObject &Pilightdata)
     else if (message && protocol)
     {
       trc(F("MQTTtoPilight msg & protocol ok"));
+      #ifdef ZradioCC1101
+        ELECHOUSE_cc1101.SetTx();           // set Transmit on
+      #endif
       result = rf.send(protocol, message);
-    }
-    else
-    {
+      #ifdef ZradioCC1101
+        ELECHOUSE_cc1101.SetRx();           // set Transmit on
+      #endif
+    }else{
       trc(F("MQTTtoPilight failed json read"));
     }
 

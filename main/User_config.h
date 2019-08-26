@@ -117,7 +117,7 @@ char gateway_name[parameters_size * 2] = Gateway_Name;
 //#define ZgatewayPilight "Pilight" //ESP8266, Arduino, ESP32
 //#define ZgatewayBT     "BT"       //ESP8266, ESP32
 #define ZgatewayRF2    "RF2"      //ESP8266, Arduino, ESP32
-#define ZgatewayRF2CC101 "RF2CC01"      //ESP8266, Arduino, ESP32
+#define ZgatewayRF2CC1101 "RF2CC1101"      //ESP8266, Arduino, ESP32
 //#define ZgatewaySRFB   "SRFB"     //                          Sonoff RF Bridge
 //#define Zgateway2G     "2G"       //ESP8266, Arduino, ESP32
 //#define ZgatewayRFM69  "RFM69"    //ESP8266, Arduino, ESP32

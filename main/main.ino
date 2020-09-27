@@ -523,7 +523,7 @@ void setup() {
 
 #if defined(ESP8266) || defined(ESP32)
 #  ifdef ESP8266
-#    ifndef ZgatewaySRFB // if we are not in sonoff rf bridge case we apply the ESP8266 GPIO optimization
+#    ifndef ZgatewaySRFB || ZgatewaySerial // if we are not in sonoff rf bridge case we apply the ESP8266 GPIO optimization
   Serial.end();
   Serial.begin(SERIAL_BAUD, SERIAL_8N1, SERIAL_TX_ONLY); // enable on ESP8266 to free some pin
 #    endif
@@ -1276,6 +1276,9 @@ void loop() {
 #endif
 #ifdef ZactuatorPWM
       PWMLoop();
+#endif
+#ifdef ZgatewaySerial
+      SerialtoMQTT();
 #endif
     } else {
       connectMQTT();
